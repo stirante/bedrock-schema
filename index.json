@@ -482,6 +482,7 @@
                             "minecraft:behavior.swim_wander",
                             "minecraft:behavior.swim_with_entity",
                             "minecraft:behavior.swoop_attack",
+                            "minecraft:behavior.target_when_pushed",
                             "minecraft:behavior.take_flower",
                             "minecraft:behavior.target_when_pushed",
                             "minecraft:behavior.tempt",
@@ -2926,7 +2927,43 @@
                         "type": "object"
                     },
                     "minecraft:behavior.ranged_attack": {
-                        "type": "object"
+                        "type": "object",
+                        "description": "Allows an entity to attack by using ranged shots. \"charge_shoot_trigger\" must be greater than 0 to enable charged up burst-shot attacks.",
+                        "properties": {
+                            "attack_interval": {
+                                "type": "number",
+                                "default": 0,
+                                "description": "Alternative to \"attack_interval_min\" & \"attack_interval_max\". Consistent reload-time (in seconds), when not using a charged shot. Does not scale with target-distance."
+                            },
+                            "attack_interval_max": {
+                                "type": "number",
+                                "default": 0,
+                                "description": "Maximum bound for reload-time range (in seconds), when not using a charged shot. Reload-time range scales with target-distance."
+                            },
+                            "attack_interval_min": {
+                                "type": "number",
+                                "default": 0,
+                                "description": "Minimum bound for reload-time range (in seconds), when not using a charged shot. Reload-time range scales with target-distance."
+                            },
+                            "attack_radius": {"type": "number", "default": 0, "description": "Minimum distance to target before this entity will attempt to shoot."},
+                            "burst_interval": {"type": "number", "default": 0, "description": "Time (in seconds) between each individual shot when firing a burst of shots from a charged up attack."},
+                            "burst_shots": {"type": "integer", "default": 1, "description": "Number of shots fired every time the attacking entity uses a charged up attack."},
+                            "charge_charged_trigger": {
+                                "type": "number",
+                                "default": 0,
+                                "description": "Time (in seconds, then add \"charge_shoot_trigger\"), before a charged up attack is done charging. Charge-time decays while target is not in sight."
+                            },
+                            "charge_shoot_trigger": {
+                                "type": "number",
+                                "default": 0,
+                                "description": "Amount of time (in seconds, then doubled) a charged shot must be charging before reloading burst shots. Charge-time decays while target is not in sight."
+                            },
+                            "ranged_fov": {"type": "number", "default": 90, "description": "Field of view (in degrees) when using sensing to detect a target for attack."},
+                            "speed_multiplier": {"type": "number", "default": 1, "description": "During attack behavior, this multiplier modifies the entity's speed when moving toward the target."},
+                            "target_in_sight_time": {"type": "number", "default": 1, "description": "Minimum amount of time (in seconds) the attacking entity needs to see the target before moving toward it."},
+                            "x_max_rotation": {"type": "number", "default": 30, "description": "Maximum rotation (in degrees), on the X-axis, this entity can rotate while trying to look at the target."},
+                            "y_max_head_rotation": {"type": "number", "default": 30, "description": "Maximum rotation (in degrees), on the Y-axis, this entity can rotate its head while trying to look at the target."}
+                        }
                     },
                     "minecraft:behavior.receive_love": {
                         "type": "object"
@@ -3508,8 +3545,7 @@
                     "minecraft:knockback_resistance": {
                         "type": "object",
                         "properties": {
-                            "value": { "$ref": "#/definitions/library/components/values/value" },
-                            "max": { "type": "number" }
+                            "value": { "$ref": "#/definitions/library/components/values/value_decimal" }
                         }
                     },
                     "minecraft:lava_movement": {
@@ -3623,10 +3659,14 @@
                         "type": "object"
                     },
                     "minecraft:on_target_acquired": {
-                        "type": "object"
+                        "type": "object",
+                        "description": "Adds a trigger to call when this entity finds a target.",
+                        "$ref": "#/definitions/library/components/values/trigger"
                     },
                     "minecraft:on_target_escape": {
-                        "type": "object"
+                        "type": "object",
+                        "description": "Adds a trigger to call when this entity loses the target it currently has.",
+                        "$ref": "#/definitions/library/components/values/trigger"
                     },
                     "minecraft:on_wake_with_owner": {
                         "type": "object"
@@ -3799,7 +3839,7 @@
                         "type": "object",
                         "description": "Defines the families this entity belongs to.",
                         "properties": {
-                            "family": { "type": "array", "description": "List of family names", "items": { "type": "string" } }
+                            "family": { "type": ["array", "string"], "description": "List of family names", "items": { "type": "string" } }
                         }
                     },
                     "minecraft:underwater_movement": { "type": "object" },
@@ -3884,7 +3924,13 @@
                     "persist_time" : { "type": "number", "default": 3.0 },
                     "attack_interval" : { "type": "integer", "default": 0 },
                     "remove_child_entities" : { "type": "boolean", "description": "If true, all entities linked to this entity in a child relationship (eg. leashed) will also be despawned.", "default": false },
-                    "trigger": { "type": "object", "properties": { "filters": { "$ref": "#/definitions/filters" }, "event" : { "type": "string" }, "target": { "type": "string", "examples": [ "other", "player", "self", "target", "baby", "block" ] } } },
+                    "trigger": {
+                        "type": "object",
+                        "properties": {
+                            "filters": { "$ref": "#/definitions/filters", "description": "The list of conditions for this trigger" },
+                            "event" : { "type": "string", "description": "The event to run when the conditions for this trigger are met" }, "target": { "type": "string","examples": [ "other", "player", "self", "target", "baby", "block"], "description": "The target of the event" }
+                            }
+                        },
                     "entity_types": {
                         "properties": {
                             "filters": { "$ref": "#/definitions/filters", "description": "Conditions that make this entry in the list valid" },
