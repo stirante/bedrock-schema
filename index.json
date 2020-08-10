@@ -316,7 +316,8 @@
                     },
                     "string": {
                         "anyOf": [
-                            { "const": "is_family" }
+                            { "const": "is_family" },
+                            { "const": "has_mob_effect" }
                         ]
                     }
                 },
@@ -697,7 +698,7 @@
                         ]
                     },
                     "has_damage": {
-                        "examples": [
+                        "enum": [
                             "anvil",
                             "attack",
                             "block_explosion",
@@ -3392,10 +3393,7 @@
                     },
                     "minecraft:health": {
                         "type": "object",
-                        "properties": {
-                            "value": { "$ref": "#/definitions/library/components/values/value" },
-                            "max": { "type": "integer" }
-                        }
+                        "$ref": "#/definitions/library/components/values/value_with_max"
                     },
                     "minecraft:hide": {
                         "type": "object"
@@ -3544,9 +3542,7 @@
                     },
                     "minecraft:knockback_resistance": {
                         "type": "object",
-                        "properties": {
-                            "value": { "$ref": "#/definitions/library/components/values/value_decimal" }
-                        }
+                        "$ref": "#/definitions/library/components/values/value_with_max"
                     },
                     "minecraft:lava_movement": {
                         "type": "object"
@@ -3574,7 +3570,10 @@
                         "type": "object"
                     },
                     "minecraft:movement": {
-                        "type": "object"
+                        "type": "object",
+                        "properties": {
+                            "value": { "$ref": "#/definitions/library/components/values/value_decimal" }
+                        }
                     },
                     "minecraft:movement.amphibious": {
                         "type": "object"
@@ -3678,19 +3677,33 @@
                         "type": "object"
                     },
                     "minecraft:physics": {
-                        "type": "object"
+                        "type": "object",
+                        "properties": {
+                            "has_collision": {
+                                "type": "boolean",
+                                "description": "Whether or not the object collides with things.",
+                                "default": true
+                            },
+                            "has_gravity": {
+                                "type": "boolean",
+                                "description": "Whether or not the entity is affected by gravity.",
+                                "default": true
+                            }
+                        }
                     },
                     "minecraft:player.saturation": {
-                        "type": "object"
+                        "properties": {
+                            "value": { "$ref": "#/definitions/library/components/values/value_decimal" }
+                        }
                     },
                     "minecraft:player.exhaustion": {
-                        "type": "object"
+                        "$ref": "#/definitions/library/components/values/value_with_max"
                     },
                     "minecraft:player.level": {
-                        "type": "object"
+                        "$ref": "#/definitions/library/components/values/value_with_max"
                     },
                     "minecraft:player.experience": {
-                        "type": "object"
+                        "$ref": "#/definitions/library/components/values/value_with_max"
                     },
                     "minecraft:pushable": {
                         "type": "object",
@@ -3773,7 +3786,16 @@
                         }
                     },
                     "minecraft:spawn_entity": {
-                        "type": [ "object", "array" ]
+                        "type": "object",
+                        "description": "Adds a timer after which this entity will spawn another entity or item (similar to vanilla's chicken's egg-laying behavior).`",
+                        "properties": {
+                            "entities": {
+                                "type": "array",
+                                "items": {
+                                    "$ref": "#/definitions/library/components/values/spawn_entity"
+                                }
+                            }
+                        }
                     },
                     "minecraft:spell_effects": {
                         "type": "object"
@@ -3899,6 +3921,13 @@
                     "max_dist": { "type": "number", "default": 0.0 },
                     "value": { "type": "integer" },
                     "value_decimal": { "type": "number" },
+                    "value_with_max": {
+                        "type": "object",
+                        "properties": {
+                            "value": { "$ref": "#/definitions/library/components/values/value" },
+                            "max": { "type": "integer" }
+                        }
+                    },
                     "search_height": { "type": "integer", "default": 1 },
                     "search_range": { "type": "integer", "default": 0 },
                     "search_count": { "type": "integer", "default": 10, "description": "The number of blocks each tick that the mob will check within it's search range and height for a valid block to move to. A value of 0 will have the mob check every block within range in one tick" },
@@ -3942,6 +3971,63 @@
                             },
                             "sprint_speed_multiplier" : { "type": "number", "default": 1.0, "description": "Multiplier for the running speed. A value of 1.0 means the speed is unchanged" },
                             "walk_speed_multiplier" : { "type": "number", "default": 1.0, "description": "Multiplier for the walking speed. A value of 1.0 means the speed is unchanged" }
+                        }
+                    },
+                    "spawn_entity": {
+                        "type": "object",
+                        "properties": {
+                            "filters": {
+                                "$ref": "#/definitions/filters"
+                            },
+                            "max_wait_time":{
+                                "type":  "integer",
+                                "description": "Maximum amount of time to randomly wait in seconds before another entity is spawned.",
+                                "default": 600
+                            },
+                            "min_wait_time": {
+                                "type":  "integer",
+                                "description": "Minimum amount of time to randomly wait in seconds before another entity is spawned.",
+                                "default": 300
+                            },
+                            "num_to_spawn":{
+                                "type":  "number",
+                                "description": "The number of entities of this type to spawn each time that this triggers.",
+                                "default": 1
+                            },
+                            "should_leash": {
+                                "type":  "boolean",
+                                "description": "If true, this the spawned entity will be leashed to the parent.",
+                                "default": false
+                            },
+                            "single_use":{
+                                "type":  "boolean",
+                                "description": "If true, this component will only ever spawn the specified entity once.",
+                                "default": false
+                            },
+                            "spawn_entity": {
+                                "type":  "string",
+                                "description": "Identifier of the entity to spawn, leave empty to spawn the item defined above instead."
+                            },
+                            "spawn_event":{
+                                "type":  "string",
+                                "description": "Event to call when the entity is spawned.",
+                                "default": "minecraft:entity_born"
+                            },
+                            "spawn_item": {
+                                "type":  "string",
+                                "description": "Item identifier of the item to spawn.",
+                                "default": "egg"
+                            },
+                            "spawn_method":{
+                                "type":  "string",
+                                "description": "Method to use to spawn the entity.",
+                                "default": "born"
+                            },
+                            "spawn_sound": {
+                                "type":  "string",
+                                "description": "Identifier of the sound effect to play when the entity is spawned.",
+                                "default": "plop"
+                            }
                         }
                     }
                 }
