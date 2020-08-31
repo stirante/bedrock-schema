@@ -2056,6 +2056,26 @@
                     "hard"
                 ]
             },
+            "item_slots": {
+                "enum": [
+                    "slot.armor.chest",
+                    "slot.armor.feet",
+                    "slot.armor.head",
+                    "slot.armor.legs",
+                    "slot.weapon",
+                    "slot.weapon.mainhand",
+                    "slot.weapon.offhand",
+                    "slot.container.",
+                    "slot.enderchest.",
+                    "slot.hotbar.",
+                    "slot.inventory.",
+                    "slot.horse.saddle",
+                    "slot.horse.chest",
+                    "slot.horse.armor",
+                    "slot.horse.",
+                    "slot.villager."
+                ]
+            },
             "components": {
                 "properties": {
                     "minecraft:annotation.break_door": {
@@ -2874,25 +2894,109 @@
                         "type": "object"
                     },
                     "minecraft:behavior.open_door": {
-                        "type": "object"
+                        "type": "object",
+                        "properties": {
+                            "close_door_after": { "type": "boolean", "default": true, "description": "If true, the mob will close the door after opening it and going through it" }
+                        }
                     },
                     "minecraft:behavior.owner_hurt_by_target": {
-                        "type": "object"
+                        "type": "object",
+                        "properties": {
+                            "entity_types": { "$ref": "#/definitions/library/components/values/entity_types", "description": "List of entity types that this mob can target if they hurt their owner" }
+                        }
                     },
                     "minecraft:behavior.owner_hurt_target": {
-                        "type": "object"
+                        "type": "object",
+                        "properties": {
+                            "entity_types": { "$ref": "#/definitions/library/components/values/entity_types", "description": "List of entity types that this entity can target if the potential target is hurt by this mob's owner" }
+                        }
                     },
                     "minecraft:behavior.panic": {
-                        "type": "object"
+                        "type": "object",
+                        "properties": {
+                            "damage_sources": {
+                                "type": "list",
+                                "items": {
+                                    "$ref": "#/definitions/library/filters/domains/has_damage",
+                                    "description": "The list of Entity Damage Sources that will cause this mob to panic."
+                                }
+                            },
+                            "force": {
+                                "type": "boolean",
+                                "default": false,
+                                "description": "If true, the mob will not panic in response to damage from other mobs. This overrides the damage types in \"damage_sources\"."
+                            },
+                            "ignore_mob_damage": {
+                                "type": "boolean",
+                                "default": false,
+                                "description": "If true, this mob will not stop panicking until it can't move anymore or the goal is removed from it."
+                            },
+                            "prefer_water": {
+                                "type": "boolean",
+                                "default": false,
+                                "description": "If true, the mob will prefer water over land."
+                            },
+                            "speed_multiplier": {
+                                "type": "number",
+                                "default": 1.0,
+                                "description": "Movement speed multiplier of the mob when using this AI Goal."
+                            }
+                        }
                     },
                     "minecraft:behavior.peek": {
-                        "type": "object"
+                        "type": "object",
+                        "properties": {
+                            "on_close": {
+                                "$ref": "#/definitions/library/components/values/trigger",
+                                "description": "Event to call when the entity is done peeking."
+                            },
+                            "on_open": {
+                                "$ref": "#/definitions/library/components/values/trigger",
+                                "description": "Event to call when the entity starts peeking."
+                            },
+                            "on_target_open": {
+                                "$ref": "#/definitions/library/components/values/trigger",
+                                "description": "Event to call when the entity's target entity starts peeking."
+                            }
+                        }
                     },
                     "minecraft:behavior.pet_sleep_with_owner": {
                         "type": "object"
                     },
                     "minecraft:behavior.pickup_items": {
-                        "type": "object"
+                        "type": "object",
+                        "properties": {
+                            "priority": {
+                                "$ref": "#/definitions/library/components/values/priority"
+                            },
+                            "max_dist": {
+                                "$ref": "#/definitions/library/components/values/max_dist"
+                            },
+                            "goal_radius": {
+                                "$ref": "#/definitions/library/components/values/goal_radius"
+                            },
+                            "speed_multiplier": {
+                                "$ref": "#/definitions/library/components/values/speed_multiplier"
+                            },
+                            "pickup_based_on_chance": {
+                                "type": "boolean",
+                                "description": "If true, depending on the difficulty, there is a random chance that the mob may not be able to pickup items.",
+                                "default": false
+                            },
+                            "can_pickup_any_item": {
+                                "type": "boolean",
+                                "description": "If true, the mob can pickup any item.",
+                                "default": false
+                            },
+                            "can_pickup_to_hand_or_equipment": {
+                                "type": "boolean",
+                                "description": "If true, the mob can pickup items to its hand or armor slots.",
+                                "default": true
+                            },
+                            "track_target": {
+                                "$ref": "#/definitions/library/components/values/track_target"
+                            }
+                        }
                     },
                     "minecraft:behavior.play": {
                         "type": "object"
@@ -3092,13 +3196,44 @@
                         "type": "object"
                     },
                     "minecraft:addrider": {
-                        "type": "object"
+                        "type": "object",
+                        "description": "Adds a rider to the entity. Requires minecraft:rideable.",
+                        "properties": {
+                            "entity_type": {
+                                "type": "string",
+                                "description": "The entity type that will be riding this entity."
+                            },
+                            "spawn_event": {
+                                "type": "string",
+                                "description": "The spawn event that will be used when the riding entity is created."
+                            }
+                        }
                     },
                     "minecraft:admire_item": {
                         "type": "object"
                     },
                     "minecraft:ageable": {
-                        "type": "object"
+                        "type": "object",
+                        "description": "Adds a timer for the entity to grow up. It can be accelerated by giving the entity the items it likes as defined by feedItems.",
+                        "properties": {
+                            "duration": {
+                                "type": "number",
+                                "description": "Amount of time before the entity grows up, -1 for always a baby.",
+                                "default": 1200
+                            },
+                            "feed_items": {
+                                "type": "array",
+                                "description": "List of items that can be fed to the entity. Includes 'item' for the item name and 'growth' to define how much time it grows up by.",
+                                "default": [],
+                                "items": {
+                                    "$ref": "#/definitions/library/items"
+                                }
+                            },
+                            "grow_up": {
+                                "$ref": "#/definitions/library/components/values/trigger",
+                                "description": "Event to run when this entity grows up."
+                            }
+                        }
                     },
                     "minecraft:ambient_sound_interval": {
                         "type": "object"
@@ -3125,13 +3260,39 @@
                         "type": "object"
                     },
                     "minecraft:balloonable": {
-                        "type": "object"
+                        "type": "object",
+                        "properties": {
+                            "mass": { "type": "number" }
+                        }
                     },
                     "minecraft:barter": {
                         "type": "object"
                     },
                     "minecraft:block_sensor": {
-                        "type": "object"
+                        "type": "object",
+                        "description": "Fires off a specified event when a block in the block list is broken within the sensor range.",
+                        "properties": {
+                            "sensor_radius": {
+                                "type": "number"
+                            },
+                            "on_break": {
+                                "type": "array",
+                                "items": {
+                                    "type": "object",
+                                    "properties": {
+                                        "block_list": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/definitions/library/blocks"
+                                            }
+                                        },
+                                        "on_block_broken": {
+                                            "type": "string"
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     },
                     "minecraft:boostable": {
                         "type": "object"
@@ -3150,7 +3311,64 @@
                         "type": "object"
                     },
                     "minecraft:breathable": {
-                        "type": "object"
+                        "type": "object",
+                        "description": "Defines what blocks this entity can breathe in and gives them the ability to suffocate.",
+                        "properties": {
+                            "breathes_air": {
+                                "type": "boolean",
+                                "description": "If true, this entity can breathe in air.",
+                                "default": false
+                            },
+                            "breathes_water": {
+                                "type": "boolean",
+                                "description": "If true, this entity can breathe in water.",
+                                "default": false
+                            },
+                            "generates_bubbles": {
+                                "type": "boolean",
+                                "description": "If true, this entity will have visible bubbles while in water.",
+                                "default": false
+                            },
+                            "breathes_solids": {
+                                "type": "boolean",
+                                "description": "If true, this entity can breathe in solid blocks.",
+                                "default": false
+                            },
+                            "breathes_lava": {
+                                "type": "boolean",
+                                "description": "If true, this entity can breathe in lava.",
+                                "default": false
+                            },
+                            "inhale_time": {
+                                "type": "number",
+                                "description": "Time in seconds to recover breath to maximum.",
+                                "default": 0
+                            },
+                            "suffocate_time": {
+                                "type": "number",
+                                "description": "Time in seconds between suffocation damage.",
+                                "default": 0
+                            },
+                            "total_supply": {
+                                "type": "number",
+                                "description": "Time in seconds the entity can hold its breath.",
+                                "default": 0
+                            },
+                            "breathe_blocks": {
+                                "type": "array",
+                                "description": "List of blocks this entity can breathe in, in addition to the rest.",
+                                "items": {
+                                    "$ref": "#/definitions/library/blocks"
+                                }
+                            },
+                            "non_breathe_blocks": {
+                                "type": "array",
+                                "description": "List of blocks this entity can't breathe in, in addition to the rest.",
+                                "items": {
+                                    "$ref": "#/definitions/library/blocks"
+                                }
+                            }
+                        }
                     },
                     "minecraft:breedable": {
                         "type": "object"
@@ -3207,7 +3425,20 @@
                         "type": "object"
                     },
                     "minecraft:damage_over_time": {
-                        "type": "object"
+                        "type": "object",
+                        "description": "The root schema comprises the entire JSON document.",
+                        "properties": {
+                            "damage_per_hurt": {
+                                "type": "number",
+                                "description": "Amount of damage caused each hurt.",
+                                "default": 1
+                            },
+                            "time_between_hurt": {
+                                "type": "number",
+                                "description": "Time in seconds between damage.",
+                                "default": 0
+                            }
+                        }
                     },
                     "minecraft:damage_sensor": {
                         "type": "object",
@@ -3302,16 +3533,99 @@
                         }
                     },
                     "minecraft:equipment": {
-                        "type": "object"
+                        "type": "object",
+                        "description": "Sets the Equipment table to use for this Entity.",
+                        "properties": {
+                            "table": {
+                                "type": "string",
+                                "description": "The file path to the equipment table, relative to the behavior pack's root."
+                            },
+                            "slot_drop_chance": {
+                                "type": "array",
+                                "description": "A list of slots with the chance to drop an equipped item from that slot.",
+                                "items": {
+                                    "type": "object",
+                                    "description": "An explanation about the purpose of this instance.",
+                                    "properties": {
+                                        "slot": {
+                                            "type": "string",
+                                            "$ref": "#/definitions/library/item_slots"
+                                        },
+                                        "drop_chance": {
+                                            "type": "number",
+                                            "default": 0.0
+                                        }
+                                    }
+                                }
+                            }
+                        }
                     },
                     "minecraft:equippable": {
                         "type": "object"
                     },
                     "minecraft:experience_reward": {
-                        "type": "object"
+                        "type": "object",
+                        "properties": {
+                            "on_bred": {
+                                "type": "string",
+                                "description": "A molang expression defining the amount of experience rewarded when this entity is successfully bred. An array of expressions adds each expression's result together for a final total.",
+                                "default": "0"
+                            },
+                            "on_death": {
+                                "type": "string",
+                                "description": "A molang expression defining the amount of experience rewarded when this entity dies. An array of expressions adds each expression's result together for a final total.",
+                                "default": "0"
+                            }
+                        }
                     },
                     "minecraft:explode": {
-                        "type": "object"
+                        "type": "object",
+                        "description": "The root schema comprises the entire JSON document.",
+                        "properties": {
+                            "fuse_length": {
+                                "type": "array",
+                                "description": "The range for the random amount of time the fuse will be lit before exploding, a negative value means the explosion will be immediate.",
+                                "items": {
+                                    "type": "number",
+                                    "default": 0.0
+                                }
+                            },
+                            "fuse_lit": {
+                                "type": "boolean",
+                                "description": "If true, the fuse is already lit when this component is added to the entity.",
+                                "default": false
+                            },
+                            "power": {
+                                "type": "number",
+                                "description": "The radius of the explosion in blocks and the amount of damage the explosion deals.",
+                                "default": 3
+                            },
+                            "causes_fire": {
+                                "type": "boolean",
+                                "description": "If true, blocks in the explosion radius will be set on fire.",
+                                "default": false
+                            },
+                            "fire_affected_by_griefing": {
+                                "type": "boolean",
+                                "description": "If true, whether the explosion causes fire is affected by the mob griefing game rule.",
+                                "default": false
+                            },
+                            "destroy_affected_by_griefing": {
+                                "type": "boolean",
+                                "description": "If true, whether the explosion breaks blocks is affected by the mob griefing game rule.",
+                                "default": false
+                            },
+                            "breaks_blocks": {
+                                "type": "boolean",
+                                "description": "If true, the explosion will destroy blocks in the explosion radius.",
+                                "default": true
+                            },
+                            "max_resistance": {
+                                "type": "number",
+                                "description": "A blocks explosion resistance will be capped at this value when an explosion occurs.",
+                                "default": 3.40282e+38
+                            }
+                        }
                     },
                     "minecraft:fire_immune": {
                         "type": "boolean"
