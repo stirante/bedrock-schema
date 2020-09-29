@@ -253,6 +253,24 @@
                 {
                     "if": { "properties": { "test": { "anyOf": [ { "const": "is_game_rule" } ] } } },
                     "then": { "properties": { "domain": { "type": "string", "$ref": "#/definitions/library/filters/domains/is_game_rule" } } }
+                },
+                {
+                    "if": { "properties": { "test": { "anyOf": [ { "const": "is_biome" } ] } } },
+                    "then": { "allOf": [
+                        {"properties": { "value": { "type": "string", "$ref": "#/definitions/library/filters/domains/is_biome" } } }
+                    ] }
+                },
+                {
+                    "if": { "properties": { "test": { "anyOf": [ { "const": "is_color" } ] } } },
+                    "then": { "allOf": [
+                        {"properties": { "value": { "type": "string", "$ref": "#/definitions/library/filters/domains/is_color" } } }
+                    ] }
+                },
+                {
+                    "if": { "properties": { "test": { "anyOf": [ { "const": "is_temperature_type" } ] } } },
+                    "then": { "allOf": [
+                        {"properties": { "value": { "type": "string", "$ref": "#/definitions/library/filters/domains/is_temperature_type" } } }
+                    ] }
                 }
             ]
         },
@@ -345,7 +363,9 @@
                             { "const": "has_trade_supply" },
                             { "const": "trusts" },
                             { "const": "has_container_open" },
-                            { "const": "has_target" }
+                            { "const": "has_target" },
+                            { "const": "is_daytime" },
+                            { "const": "is_sleeping" }
                         ]
                     },
                     "decimal": {
@@ -365,13 +385,18 @@
                             { "const": "is_variant" },
                             { "const": "is_skin_id" },
                             { "const": "is_altitude" },
-                            { "const": "rider_count" }
+                            { "const": "rider_count" },
+                            { "const": "moon_phase" }
                         ]
                     },
                     "string": {
                         "anyOf": [
                             { "const": "is_family" },
-                            { "const": "has_mob_effect" }
+                            { "const": "has_mob_effect" },
+                            { "const": "has_tag" },
+                            { "const": "has_ability" },
+                            { "const": "has_biome_tag" },
+                            { "const": "is_block" }
                         ]
                     }
                 },
@@ -777,6 +802,56 @@
                             "thorns",
                             "void",
                             "wither"
+                        ]
+                    },
+                    "is_biome": {
+                        "enum": [
+                            "beach",
+                            "desert",
+                            "extreme_hills",
+                            "flat",
+                            "forest",
+                            "ice",
+                            "jungle",
+                            "mesa",
+                            "mushroom_island",
+                            "ocean",
+                            "plain",
+                            "river",
+                            "savanna",
+                            "stone_beach",
+                            "swamp",
+                            "taiga",
+                            "the_end",
+                            "the_nether"
+                        ]
+                    },
+                    "is_color": {
+                        "enum": [
+                            "black",
+                            "blue",
+                            "brown",
+                            "cyan",
+                            "gray",
+                            "green",
+                            "light_blue",
+                            "light_green",
+                            "magenta",
+                            "orange",
+                            "pink",
+                            "purple",
+                            "red",
+                            "silver",
+                            "white",
+                            "yellow"
+                        ]
+                    },
+                    "is_temperature_type": {
+                        "enum": [
+                            "cold",
+                            "mild",
+                            "ocean",
+                            "warm"
                         ]
                     }
                 }
