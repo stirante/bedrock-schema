@@ -3643,8 +3643,7 @@
                         "properties": {
                             "triggers": {
                                 "type": ["array", "object"],
-                                "items": [ { "$ref": "#/definitions/library/components/values/trigger" } ],
-                                "$ref": "#/definitions/library/components/values/trigger"
+                                "items": [ { "$ref": "#/definitions/library/components/values/trigger" } ]
                             }
                         }
                     },
